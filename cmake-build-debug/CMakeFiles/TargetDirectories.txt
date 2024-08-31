@@ -1,0 +1,3 @@
+C:/Users/Carlos/CLionProjects/JuegodelaOca/cmake-build-debug/CMakeFiles/JuegodelaOca.dir
+C:/Users/Carlos/CLionProjects/JuegodelaOca/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Carlos/CLionProjects/JuegodelaOca/cmake-build-debug/CMakeFiles/rebuild_cache.dir
