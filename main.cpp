@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 
-const bool DEBUG = true;
+const bool DEBUG = false;
 const int NUM_CASILLAS = 63;
 const int PUENTE_1 = 6;
 const int PUENTE_2 = 12;
@@ -156,53 +156,83 @@ int efectoPosicion(int casillaActual) {
 
 int efectoTiradas(int casillaActual, int numeroDeTiradas) {
     if (casillaActual == POSADA) {
+        std::cout << "HAS CAIDO EN LA POSADA" << std::endl;
+        std::cout << "PIERDES 1 TURNO" << std::endl;
         numeroDeTiradas-=1;
     }
     else if (casillaActual == PRISION) {
+        std::cout << "HAS CAIDO EN LA PRISION" << std::endl;
+        std::cout << "PIERDES 2 TURNOS" << std::endl;
         numeroDeTiradas-=2;
     }
     else if (casillaActual == POZO) {
+        std::cout << "HAS CAIDO EN EL POZO" << std::endl;
+        std::cout << "PIERDES 3 TURNOS" << std::endl;
         numeroDeTiradas-=3;
+    }
+    else if (esOca(casillaActual)) {
+        std::cout << "GANAS 1 TURNO" << std::endl;
+        numeroDeTiradas++;
+    }
+    else if (esPuente(casillaActual)) {
+        std::cout << "GANAS 1 TURNO" << std::endl;
+        numeroDeTiradas++;
+    }
+    else if (esDados(casillaActual)) {
+        std::cout << "GANAS 1 TURNO" << std::endl;
+        numeroDeTiradas++;
     }
     return numeroDeTiradas;
 }
 
 
-int do_turno(int jugador) {
+int do_turno(int jugador, int &tiradas) {
     jugador = efectoPosicion(jugador);
-    efectoTiradas(jugador,1);
+    tiradas = efectoTiradas(jugador, tiradas);
     std::cout << "ESTAS EN: " << jugador <<std::endl;
     std::cout << "" << std::endl;
     return jugador;
 }
 
-void turno(int &jugador) {
+void turno(int &jugador, int &tiradas) {
     std::cout << "CASILLA ACTUAL: " << jugador <<std::endl;
-    if (DEBUG) {
-        jugador = tirarDadoManual(jugador);
-        jugador = do_turno(jugador);
-    }else {
-        jugador += tirarDado();
-        jugador = do_turno(jugador);
+    if (tiradas >= 1) {
+        for (int i = 0; i < tiradas; tiradas--) {
+            if (DEBUG) {
+                jugador = tirarDadoManual(jugador);
+                jugador = do_turno(jugador, tiradas);
+            }else {
+                jugador += tirarDado();
+                jugador = do_turno(jugador, tiradas);
+            }
+        }
+    }
+    else {
+        std::cout << "****PIERDES TURNO****" <<std::endl;
+        std::cout << "TURNOS DE PENALIZACION RESTANTES: " << -tiradas <<std::endl;
+        std::cout << "" << std::endl;
     }
 }
 
 int main() {
     srand(time(NULL));
     int jugador1 = 1, jugador2 = 1;
+    int tiradas1 = 1, tiradas2 = 1;
     bool final = false;
     int empieza = quienEmpieza();
     if (empieza == 1) {
         std::cout<<"**** Empieza el jugador 1 ****"<<std::endl;
-        turno(jugador1);
+        turno(jugador1, tiradas1);
         std::cout<<"** TURNO DEL JUGADOR 2 **"<<std::endl;
-        turno(jugador2);
+        turno(jugador2, tiradas2);
+        tiradas1++; tiradas2++;
 
     }else {
         std::cout<<"**** Empieza el jugador 2 ****"<<std::endl;
-        turno(jugador2);
+        turno(jugador2, tiradas2);
         std::cout<<"** TURNO DEL JUGADOR 1 **"<<std::endl;
-        turno(jugador1);
+        turno(jugador1, tiradas1);
+        tiradas1++; tiradas2++;
     }
 
     while (!final) {
@@ -218,15 +248,18 @@ int main() {
         }
 
         if (empieza == 1) {
+
             std::cout<<"** TURNO DEL JUGADOR 1 **"<<std::endl;
-            turno(jugador1);
+            turno(jugador1,tiradas1);
             std::cout<<"** TURNO DEL JUGADOR 2 **"<<std::endl;
-            turno(jugador2);
+            turno(jugador2,tiradas2);
+            tiradas1++; tiradas2++;
         }else {
             std::cout<<"** TURNO DEL JUGADOR 2 **"<<std::endl;
-            turno(jugador2);
+            turno(jugador2, tiradas2);
             std::cout<<"** TURNO DEL JUGADOR 1 **"<<std::endl;
-            turno(jugador1);
+            turno(jugador1, tiradas1);
+            tiradas1++; tiradas2++;
         }
     }
 
